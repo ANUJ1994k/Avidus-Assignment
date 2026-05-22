@@ -9,7 +9,7 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",https://avidus-assignment-1.onrender.com
+      "http://localhost:5173", "https://avidus-assignment-1.onrender.com"
     ],
     credentials: true,
   })
