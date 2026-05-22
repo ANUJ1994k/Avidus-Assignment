@@ -1,6 +1,8 @@
 // CREATE TASK
 const User = require("../models/User");
 const Task = require("../models/Task");
+const ActivityLog = require("../models/ActivityLog");
+
 exports.createTask = async (req, res) => {
 
   try {
@@ -13,6 +15,11 @@ exports.createTask = async (req, res) => {
       status,
       createdBy: req.user.id,
     });
+    await ActivityLog.create({
+  userId: req.user.id,
+  action: "CREATE_TASK",
+  details: `Task created: ${task.title}`,
+});
 
     res.status(201).json({
       success: true,
@@ -88,7 +95,11 @@ exports.updateTask = async (req, res) => {
       req.body,
       { new: true }
     );
-
+await ActivityLog.create({
+  userId: req.user.id,
+  action: "UPDATE_TASK",
+  details: `Task updated: ${updatedTask.title}`,
+});
     res.status(200).json({
       success: true,
       message: "Task updated successfully",
@@ -113,7 +124,6 @@ exports.deleteTask = async (req, res) => {
 
     const task = await Task.findById(req.params.id);
 
-    // Check task exists
     if (!task) {
 
       return res.status(404).json({
@@ -123,7 +133,6 @@ exports.deleteTask = async (req, res) => {
 
     }
 
-    // Ownership validation
     if (task.createdBy.toString() !== req.user.id) {
 
       return res.status(403).json({
@@ -133,6 +142,14 @@ exports.deleteTask = async (req, res) => {
 
     }
 
+    // CREATE ACTIVITY LOG
+    await ActivityLog.create({
+      userId: req.user.id,
+      action: "DELETE_TASK",
+      details: `Task deleted: ${task.title}`,
+    });
+
+    // DELETE TASK
     await Task.findByIdAndDelete(req.params.id);
 
     res.status(200).json({

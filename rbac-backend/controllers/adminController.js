@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const Task = require("../models/Task");
-
+const ActivityLog = require("../models/ActivityLog");
 
 // GET ALL USERS
 exports.getAllUsers = async (req, res) => {
@@ -159,6 +159,31 @@ exports.deleteAnyTask = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Task deleted successfully by admin",
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+
+};
+
+// GET ALL LOGS
+exports.getAllLogs = async (req, res) => {
+
+  try {
+
+    const logs = await ActivityLog.find()
+      .populate("userId", "name email role")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      logs,
     });
 
   } catch (error) {

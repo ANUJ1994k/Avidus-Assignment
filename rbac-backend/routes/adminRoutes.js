@@ -1,13 +1,13 @@
 const express = require("express");
 
 const router = express.Router();
-
 const {
   getAllUsers,
   deleteUser,
   updateUserStatus,
   getAllTasks,
   deleteAnyTask,
+  getAllLogs,
 } = require("../controllers/adminController");
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -57,6 +57,13 @@ router.delete(
   authMiddleware,
   adminMiddleware,
   deleteAnyTask
+);
+// VIEW ALL LOGS
+router.get(
+  "/logs",
+  authMiddleware,
+  adminMiddleware,
+  getAllLogs
 );
 
 module.exports = router;

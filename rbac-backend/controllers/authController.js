@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
+const ActivityLog = require("../models/ActivityLog");
 
 // SIGNUP
 exports.signup = async (req, res) => {
@@ -43,59 +43,64 @@ exports.signup = async (req, res) => {
 
 // SIGNIN
 exports.signin = async (req, res) => {
-    try {
-      const { email, password } = req.body;
-  
-      // Check user
-      const user = await User.findOne({ email });
-  
-      if (!user) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid credentials",
-        });
-      }
-  
-      // Check password
-      const isMatch = await bcrypt.compare(password, user.password);
-  
-      if (!isMatch) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid credentials",
-        });
-      }
-  
-      // Check user status
-      if (user.status === "Inactive") {
-        return res.status(403).json({
-          success: false,
-          message: "Account is inactive",
-        });
-      }
-  
-      // Generate token
-      const token = jwt.sign(
-        {
-          id: user._id,
-          role: user.role,
-        },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "7d",
-        }
-      );
-  
-      res.status(200).json({
-        success: true,
-        message: "Login successful",
-        token,
-        user,
-      });
-    } catch (error) {
-      res.status(500).json({
+  try {
+    const { email, password } = req.body;
+
+    // Check user
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
         success: false,
-        message: error.message,
+        message: "Invalid credentials",
       });
     }
-  };
+
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    // Check user status
+    if (user.status === "Inactive") {
+      return res.status(403).json({
+        success: false,
+        message: "Account is inactive",
+      });
+    }
+
+    // Generate token
+    const token = jwt.sign(
+      {
+        id: user._id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      },
+    );
+    await ActivityLog.create({
+      userId: user._id,
+      action: "LOGIN",
+      details: `${user.name} logged in`,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
