@@ -6,7 +6,14 @@ const adminRoutes = require("./routes/adminRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",https://avidus-assignment-1.onrender.com
+    ],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
