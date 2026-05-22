@@ -12,7 +12,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 
 import AdminRoute from "./routes/AdminRoute";
 import Tasks from "./pages/Tasks";
-
+import Register from "./pages/Register";
 import AdminTasks from "./pages/AdminTasks";
 
 function App() {
@@ -64,6 +64,7 @@ function App() {
             </AdminRoute>
           }
         />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </BrowserRouter>
   );

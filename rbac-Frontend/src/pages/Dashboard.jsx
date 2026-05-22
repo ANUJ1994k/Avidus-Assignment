@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import API from "../api/axios";
 
-import Sidebar from "../components/Sidebar";
+import DashboardLayout from "../layouts/DashboardLayout";
 
 function Dashboard() {
 
@@ -21,48 +21,88 @@ function Dashboard() {
 
   useEffect(() => {
 
-    if (user.role === "Admin") {
-
-      fetchAdminStats();
-
-    }
+    fetchStats();
 
   }, []);
 
-  const fetchAdminStats = async () => {
+  const fetchStats = async () => {
 
     try {
 
-      const usersRes = await API.get(
-        "/admin/users",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      // ADMIN
 
-      const tasksRes = await API.get(
-        "/admin/tasks",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      if (user.role === "Admin") {
 
-      const tasks = tasksRes.data.tasks;
+        const usersRes = await API.get(
+          "/admin/users",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      setStats({
-        users: usersRes.data.users.length,
-        tasks: tasks.length,
-        completed: tasks.filter(
-          (task) => task.status === "Completed"
-        ).length,
-        pending: tasks.filter(
-          (task) => task.status === "Pending"
-        ).length,
-      });
+        const tasksRes = await API.get(
+          "/admin/tasks",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const tasks = tasksRes.data.tasks;
+
+        setStats({
+          users: usersRes.data.users.length,
+
+          tasks: tasks.length,
+
+          completed: tasks.filter(
+            (task) =>
+              task.status === "Completed"
+          ).length,
+
+          pending: tasks.filter(
+            (task) =>
+              task.status === "Pending"
+          ).length,
+        });
+
+      }
+
+      // NORMAL USER
+
+      else {
+
+        const tasksRes = await API.get(
+          "/tasks",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const tasks = tasksRes.data.tasks;
+
+        setStats({
+          users: 0,
+
+          tasks: tasks.length,
+
+          completed: tasks.filter(
+            (task) =>
+              task.status === "Completed"
+          ).length,
+
+          pending: tasks.filter(
+            (task) =>
+              task.status === "Pending"
+          ).length,
+        });
+
+      }
 
     } catch (error) {
 
@@ -74,51 +114,61 @@ function Dashboard() {
 
   return (
 
-    <div style={{ display: "flex" }}>
+    <DashboardLayout>
 
-      <Sidebar />
+      <h1>
+        Welcome, {user.name}
+      </h1>
 
-      <div style={{ padding: "20px" }}>
+      <div className="stats-grid">
 
-        <h1>Welcome {user.name}</h1>
+        {/* ADMIN ONLY */}
 
         {user.role === "Admin" && (
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 200px)",
-              gap: "20px",
-            }}
-          >
+          <div className="stat-card">
 
-            <div>
-              <h3>Total Users</h3>
-              <h1>{stats.users}</h1>
-            </div>
+            <h2>{stats.users}</h2>
 
-            <div>
-              <h3>Total Tasks</h3>
-              <h1>{stats.tasks}</h1>
-            </div>
-
-            <div>
-              <h3>Completed Tasks</h3>
-              <h1>{stats.completed}</h1>
-            </div>
-
-            <div>
-              <h3>Pending Tasks</h3>
-              <h1>{stats.pending}</h1>
-            </div>
+            <p>Total Users</p>
 
           </div>
 
         )}
 
+        {/* TOTAL TASKS */}
+
+        <div className="stat-card">
+
+          <h2>{stats.tasks}</h2>
+
+          <p>Total Tasks</p>
+
+        </div>
+
+        {/* COMPLETED */}
+
+        <div className="stat-card">
+
+          <h2>{stats.completed}</h2>
+
+          <p>Completed Tasks</p>
+
+        </div>
+
+        {/* PENDING */}
+
+        <div className="stat-card">
+
+          <h2>{stats.pending}</h2>
+
+          <p>Pending Tasks</p>
+
+        </div>
+
       </div>
 
-    </div>
+    </DashboardLayout>
 
   );
 

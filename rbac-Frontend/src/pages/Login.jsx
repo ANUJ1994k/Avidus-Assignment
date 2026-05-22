@@ -2,9 +2,8 @@ import { useState } from "react";
 import API from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-
+import { Link } from "react-router-dom";
 function Login() {
-
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -14,59 +13,41 @@ function Login() {
   });
 
   const handleChange = (e) => {
-
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
-
   };
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
 
     try {
-
-      const response = await API.post(
-        "/auth/signin",
-        formData
-      );
+      const response = await API.post("/auth/signin", formData);
 
       console.log(response.data);
 
-    //   // STORE TOKEN
-    //   localStorage.setItem(
-    //     "token",
-    //     response.data.token
-    //   );
-    login(response.data.user, response.data.token);
+      //   // STORE TOKEN
+      //   localStorage.setItem(
+      //     "token",
+      //     response.data.token
+      //   );
+      login(response.data.user, response.data.token);
 
       // STORE USER
-      localStorage.setItem(
-        "user",
-        JSON.stringify(response.data.user)
-      );
+      localStorage.setItem("user", JSON.stringify(response.data.user));
 
       alert("Login Successful");
 
       navigate("/dashboard");
-
     } catch (error) {
-
       console.log(error);
 
-      alert(
-        error.response?.data?.message ||
-        "Login failed"
-      );
-
+      alert(error.response?.data?.message || "Login failed");
     }
-
   };
 
   return (
-
     <div
       style={{
         height: "100vh",
@@ -76,7 +57,6 @@ function Login() {
         background: "#f4f4f4",
       }}
     >
-
       <form
         onSubmit={handleSubmit}
         style={{
@@ -86,7 +66,6 @@ function Login() {
           width: "350px",
         }}
       >
-
         <h2>Login</h2>
 
         <input
@@ -128,13 +107,13 @@ function Login() {
         >
           Login
         </button>
-
+        <p className="toggle-text">
+          Don't have an account?
+          <Link to="/register">Register</Link>
+        </p>
       </form>
-
     </div>
-
   );
-
 }
 
 export default Login;

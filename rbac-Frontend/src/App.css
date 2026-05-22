@@ -1,0 +1,49 @@
+/* STATS GRID */
+
+.stats-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(250px, 1fr));
+
+  gap: 20px;
+
+  margin-top: 30px;
+
+}
+
+/* STAT CARD */
+
+.stat-card {
+
+  background: white;
+
+  padding: 30px;
+
+  border-radius: 12px;
+
+  text-align: center;
+
+  box-shadow:
+    0 2px 10px rgba(0,0,0,0.1);
+
+}
+
+.stat-card h2 {
+
+  font-size: 40px;
+
+  color: #2563eb;
+
+  margin-bottom: 10px;
+
+}
+
+.stat-card p {
+
+  color: #666;
+
+  font-size: 18px;
+
+}
